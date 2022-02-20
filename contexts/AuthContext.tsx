@@ -2,6 +2,7 @@ import { createContext, SetStateAction, useEffect, useState } from 'react';
 import { recoverUserInformation, signInRequest } from '../services/auth';
 import { setCookie, parseCookies } from 'nookies';
 import Router from 'next/router';
+import { api } from '../services/api';
 
 type User = {
 	name: string;
@@ -47,6 +48,8 @@ export function AuthProvider({ children }: any) {
 		setCookie(undefined, 'inventory.token', token, {
 			maxAge: 60 * 60 * 1, // 1 hour
 		});
+		
+		api.defaults.headers['Authorization'] = `Bearer ${token}`;
 
 		setUser(user);
 
