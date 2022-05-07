@@ -13,7 +13,6 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import Head from 'next/head';
 import { NextPage } from 'next';
 import { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
@@ -39,8 +38,8 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 type SignInData = {
-	email: string;
-	password: string;
+	email: FormDataEntryValue | null;
+	password: FormDataEntryValue | null;
 };
 
 const Home: NextPage = () => {
@@ -57,13 +56,12 @@ const Home: NextPage = () => {
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const data = new FormData(event.currentTarget);
-		// eslint-disable-next-line no-console
 
 		const credentialStrings = {
-			email: JSON.stringify(data.get('email')),
-			password: JSON.stringify(data.get('password')),
+			email: data.get('email'),
+			password: data.get('password'),
 		};
-
+		// eslint-disable-next-line no-console
 		handleSignIn(credentialStrings);
 	};
 

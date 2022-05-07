@@ -1,18 +1,18 @@
 import { createContext, SetStateAction, useEffect, useState } from 'react';
-import { recoverUserInformation, signInRequest } from '../services/auth';
 import { setCookie, parseCookies } from 'nookies';
 import Router from 'next/router';
+import axios from 'axios';
+import jwt_decode from 'jwt-decode';
 import { api } from '../services/api';
 
 type User = {
 	name: string;
 	email: string;
-	avatar_url: string;
 };
 
 type SignInData = {
-	email: string;
-	password: string;
+	email: FormDataEntryValue | null;
+	password: FormDataEntryValue | null;
 };
 
 type AuthContextType = {
@@ -29,31 +29,36 @@ export function AuthProvider({ children }: any) {
 	const isAuthenticated = !!user;
 
 	useEffect(() => {
-		const { 'inventory.token': token } = parseCookies();
+		const { 'inventario.token': token } = parseCookies();
 
 		if (token) {
-			recoverUserInformation().then(
-				(response: { user: SetStateAction<User | null> }) =>
-					setUser(response.user)
-			);
+			api.get('/usuario').then((response) => {
+				setUser({
+					name: response.data.nome,
+					email: response.data.email,
+				});
+
+				Router.push('/itens');
+			});
 		}
 	}, []);
 
 	const signIn = async ({ email, password }: SignInData) => {
-		const { token, user } = await signInRequest({
-			email,
-			password,
-		});
+		await axios
+			.post('http://localhost:8000/auth', {
+				email: email,
+				senha: password,
+			})
+			.then((response) => {
+				setCookie(undefined, 'inventario.token', response.data.token, {
+					maxAge: 60 * 60 * 8, // 8 horas
+				});
 
-		setCookie(undefined, 'inventory.token', token, {
-			maxAge: 60 * 60 * 1, // 1 hour
-		});
-		
-		api.defaults.headers['Authorization'] = `Bearer ${token}`;
+				setUser({ name: response.data.nome, email: response.data.email });
 
-		setUser(user);
-
-		Router.push('/itens');
+				Router.push('/itens');
+			})
+			.catch((error) => console.log(error));
 	};
 
 	return (

@@ -11,11 +11,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
 import styles from '../styles/Home.module.css';
+import { useEffect, useState } from 'react';
+import { api } from '../services/api';
 
 const renderStateStyle = (params: GridRenderCellParams<string>) => {
 	let value = params.value;
 
-	if (value === 'Bom') {
+	if (value === 'bom') {
 		return <p className={styles.dataTableStateGreen}>Bom</p>;
 	} else if (value === 'Necessário troca') {
 		return <p className={styles.dataTableStateRed}>Necessário troca</p>;
@@ -72,122 +74,24 @@ const columns = [
 	},
 ];
 
-const rows = [
-	{
-		id: 1,
-		descricao: 'Monitor',
-		local: 'Informática',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 2,
-		descricao: 'Cadeira',
-		local: 'Faturamento',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 3,
-		descricao: 'Maca',
-		local: 'Clínica Cirúrgica',
-		estado: 'Necessário troca',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 4,
-		descricao: 'Computador',
-		local: 'Comunicação',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 5,
-		descricao: 'Impressora',
-		local: 'Almoxarifado',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Marca HP',
-	},
-	{
-		id: 6,
-		descricao: 'Notebook',
-		local: 'Qualidade',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 7,
-		descricao: 'Notebook',
-		local: 'Compras',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 8,
-		descricao: 'Monitor',
-		local: 'Departamento Pessoal',
-		estado: 'Gasto',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 9,
-		descricao: 'Roxie',
-		local: 'Harvey',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 10,
-		descricao: 'Roxie',
-		local: 'Harvey',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 11,
-		descricao: 'Roxie',
-		local: 'Harvey',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 12,
-		descricao: 'Roxie',
-		local: 'Harvey',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 13,
-		descricao: 'Roxie',
-		local: 'Harvey',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-	{
-		id: 14,
-		descricao: 'Roxie',
-		local: 'Harvey',
-		estado: 'Bom',
-		data: '18/02/2022',
-		obs: 'Teste',
-	},
-];
-
 export default function DataTable() {
+	const [items, setItems] = useState([]);
+
+	useEffect(() => {
+		api.get('/item').then((response) => setItems(response.data));
+	}, []);
+
+	const rows = items.map((item: any) => {
+		return {
+			id: item.codigo,
+			descricao: item.descricao,
+			local: item.local,
+			estado: item.estado,
+			data: item.criadoEm,
+			obs: item.observacao,
+		};
+	});
+
 	return (
 		<div style={{ height: 650, width: '100%' }}>
 			<DataGrid
