@@ -1,18 +1,15 @@
 import * as React from 'react';
-import {
-	DataGrid,
-	GridActionsCellItem,
-	GridColDef,
-	GridRenderCellParams,
-	GridToolbar,
-} from '@mui/x-data-grid';
-import { Button, Typography } from '@mui/material';
+import { DataGrid, GridActionsCellItem,	GridRenderCellParams, GridToolbar} from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
 import styles from '../styles/Home.module.css';
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
+
+import Box from '@mui/material/Box';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 
 const renderStateStyle = (params: GridRenderCellParams<string>) => {
 	let value = params.value;
@@ -81,13 +78,13 @@ export default function DataTable() {
 		api.get('/item').then((response) => setItems(response.data));
 	}, []);
 
-	const rows = items.map((item: any) => {
+	const rows = items.map((item: any) => {		
 		return {
 			id: item.codigo,
 			descricao: item.descricao,
 			local: item.local,
 			estado: item.estado,
-			data: item.criadoEm,
+			data: formatData(item.criadoEm),
 			obs: item.observacao,
 		};
 	});
@@ -101,6 +98,21 @@ export default function DataTable() {
 				rowsPerPageOptions={[5]}
 				components={{ Toolbar: GridToolbar }}
 			/>
+			<Box sx={{position: 'fixed', left: '90%', bottom: '5%'}}>
+				<Fab color='primary' aria-label='add'>
+					<AddIcon />
+				</Fab>
+			</Box>
 		</div>
 	);
+}
+
+function formatData(data: string) {
+	let regex = /.*(?=T\w)/gi;
+	let withoutHours = data.match(regex);
+	if(withoutHours !== null) {
+		let date = withoutHours[0].split("-").reverse().join("/")
+		return date;
+	}
+	return
 }

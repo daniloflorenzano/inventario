@@ -44,8 +44,8 @@ export function AuthProvider({ children }: any) {
 	}, []);
 
 	const signIn = async ({ email, password }: SignInData) => {
-		await axios
-			.post('http://localhost:8000/auth', {
+		await api
+			.post('/auth', {
 				email: email,
 				senha: password,
 			})
